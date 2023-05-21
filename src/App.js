@@ -1,24 +1,21 @@
-import logo from './logo.svg';
+// import logo from './logo.svg';
+import React from 'react';
 import './App.css';
-
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Tondeuse from './components/Tondeuse';
+import First from './components/First';
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <nav>
+        <a href='tondeuse' >Tondeuse </a>
+        <a href='first' style={{ marginLeft: "25px", background: "#fhfhfh" }}>First </a>
+      </nav>
+      <Routes>
+        <Route exact path="/tondeuse" element={<Tondeuse />} />
+        <Route exact path="/first" element={<First />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
