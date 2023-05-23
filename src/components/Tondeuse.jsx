@@ -3,8 +3,8 @@ import tonImg from '../image/tondeuse40.png';
 // import txtFile from '../files/order.txt';
 
 export default function Tondeuse() {
-    // const [x, setx] = useState(9);
-    // const [y, sety] = useState(6);
+    const [xcoor, setXcoor] = useState(null);
+    const [ycoor, setYcoor] = useState(null);
     const [tondeuse, setTondeuse] = useState([]);
     const [surFace, setSurFace] = useState({ x: 0, y: 0 });
     function readFile(f) {
@@ -18,6 +18,11 @@ export default function Tondeuse() {
         }
         reader.readAsText(f);
     }
+
+
+    useEffect(() => {
+        console.log('surFace', surFace);
+    }, [surFace]);
     function analyseFile(content) {
         if (!content) {
             alert("Le contenu du fichier est vide ou non défini.");
@@ -29,52 +34,82 @@ export default function Tondeuse() {
         // console.log('coordonnées de premier ligns' + coordonDePremierLign);
         const coordoneX = parseInt(coordonDePremierLign[0]);
         const coordoneY = parseInt(coordonDePremierLign[1]);
-        setSurFace({ x: coordoneX, y: coordoneY });
+        console.log('coorX', coordoneX);
+        console.log('coorY', coordoneY);
+        // updateSurFace(coordoneX, coordoneY);
+        setSurFace(prev => ({ ...prev, x: coordoneX, y: coordoneY }));
+        // terre(coordoneX, coordoneY);
+        setXcoor(coordoneX);
+        setYcoor(coordoneY);
+
         // Lire les informations des tondeuses
         const tondeuseData = [];
-        let currentTondeuse = [];
+        let currentTondeuse = {
+            x: '',
+            y: '',
+            orientation: '',
+            instruction: []
+        };
         for (let i = 1; i < ligns.length; i++) {
             const lign = ligns[i].trim();
-            // console.log('lign' + lign);
-            if (i % 2 === 1) {
+            if (i % 2 !== 0) {
                 const positionTond = lign.split(' ');
                 const x = parseInt(positionTond[0]);
                 const y = parseInt(positionTond[1]);
                 const orientation = positionTond[2];
-                currentTondeuse = { x, y, orientation };
+                currentTondeuse = { x: x, y: y, orientation: orientation };
             } else {
                 const instruction = lign.split('');
                 currentTondeuse.instruction = instruction;
-                // tondeuseData.push(currentTondeuse);
+                tondeuseData.push({ ...currentTondeuse });
                 // console.log(instruction);
             }
-            console.log(tondeuseData);
+            // console.log(`${i}`, lign);
         }
-        let mowerCoord = currentTondeuse;
-        let mowerInstruction = currentTondeuse.instruction;
-        let updateTond = [];
-        for (let i = 0; i < mowerInstruction.length; i++) {
-            switch (mowerInstruction[i]) {
-                case 'R':
-                    updateTond = rotateRight(mowerCoord);
-                    break;
-                case 'L':
-                    updateTond = rotateLeft(mowerCoord);
-                    break;
-                case 'F':
-                    updateTond = moveForward(mowerCoord);
-                    break;
-                default:
-                    break;
+        // console.log('tond', tondeuseData);
+        // console.log('surFace', surFace);
+        for (let i = 0; i < tondeuseData.length; i++) {
+            var tondeuse = tondeuseData[i]; // Récupérez la tondeuse à chaque itération
+            // console.log('tondeuse', tondeuse);
+            let mowerInstruction = tondeuse.instruction;
+            // console.log('instru', mowerInstruction);
+            let updateTond = [];
+            for (let j = 0; j < mowerInstruction.length; j++) {
+                switch (mowerInstruction[j]) {
+                    case 'R':
+                        updateTond = rotateRight(tondeuse);
+                        // console.log('update orient right', updateTond);
+                        tondeuse = updateTond;
+                        break;
+                    case 'L':
+                        updateTond = rotateLeft(tondeuse);
+                        // console.log('update orient left', updateTond);
+                        tondeuse = updateTond;
+                        break;
+                    case 'F':
+                        updateTond = moveForward(tondeuse, coordoneX, coordoneY);
+                        // console.log('update orient forward', updateTond);
+                        tondeuse = updateTond;
+                        break;
+                    default:
+                        break;
+                }
             }
+            tondeuseData[i] = updateTond;
+            // console.log("tondeuse update", updateTond);
         }
-        tondeuseData.push(updateTond);
         console.log("tondeuse data", tondeuseData);
-        // setTondeuse(tondeuseData);
-        function moveForward(tondeuse) {
+        setTondeuse(tondeuseData);
+
+        // function updateSurFace(x, y) {
+        //     setSurFace(prev => ({ ...prev, x: x, y: y }));
+        //     console.log('surFace', surFace);
+        // }
+
+        function moveForward(tondeuse, xcoor, ycoor) {
             const { x, y, orientation } = tondeuse;
-            let newX = '';
-            let newY = '';
+            let newX = x;
+            let newY = y;
             switch (orientation) {
                 case 'N':
                     newY = y + 1;
@@ -91,10 +126,11 @@ export default function Tondeuse() {
                 default:
                     break;
             }
-            if (newX >= 0 && newX <= surFace.x && newY >= 0 && newY <= surFace.y) {
-                return [{ ...tondeuse, x: newX, y: newY }];
+            if (newX <= xcoor && newY <= ycoor) {
+                return ({ ...tondeuse, x: newX, y: newY });
+            } else {
+                return ({ ...tondeuse });
             }
-            return tondeuse;
         }
         function rotateLeft(tondeuse) {
             const { orientation } = tondeuse;
@@ -115,7 +151,7 @@ export default function Tondeuse() {
                 default:
                     break;
             }
-            return [{ ...tondeuse, orientation: newOrient }];
+            return ({ ...tondeuse, orientation: newOrient });
         }
         function rotateRight(tondeuse) {
             const { orientation } = tondeuse;
@@ -136,7 +172,7 @@ export default function Tondeuse() {
                 default:
                     break;
             }
-            return [{ ...tondeuse, orientation: newOrient }];
+            return ({ ...tondeuse, orientation: newOrient });
         }
     }
     // console.log("tond", tondeuse);
@@ -168,13 +204,12 @@ export default function Tondeuse() {
     //     }
     // }
     //     sequentiellement();
-
     // useEffect(() => {
     //     sequentiellement();
     // }, [])
 
-    function terre() {
-        let z = surFace.x * surFace.y;
+    function terre(x, y) {
+        let z = x * y;
         const divs = [];
         for (let i = 0; i < z; i++) {
             divs.push(<div key={i} style={{ width: "40px", height: "40px" }} className='bg-success border border-warning m-1' />);
@@ -207,7 +242,7 @@ export default function Tondeuse() {
                         <p>Orientation: {tond.orientation}</p>
                         <div style={{ width: `${surFace.x * 50}px`, height: `${surFace.y * 20}px`, display: 'flex', flexWrap: 'wrap', margin: 'auto', position: 'relative' }}>
                             <img src={tonImg} alt="tondeuse" style={{ position: 'absolute' }} />
-                            {terre()}
+                            {terre(tond.x, tond.y)}
                         </div>
                     </div>
                 ))}
