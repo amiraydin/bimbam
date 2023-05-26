@@ -22,13 +22,14 @@ export default function Navbar() {
                             {logedin && <a className="nav-link active" aria-current="page" href="/home">Home</a>}
                         </li>
                         <li className="nav-item">
-                            {logedin && <button className="btn btn-outline-danger text-end" aria-current="page" onClick={logout} >Logout</button>}
+
                         </li>
                     </ul>
                     <form className="d-flex">
                         <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
                         <button className="btn btn-outline-success" >Search</button>
                     </form>
+                    {logedin && <button className="btn btn-outline-danger text-end ms-5" aria-current="page" onClick={logout} >Logout</button>}
                 </div>
             </div>
         </nav>
