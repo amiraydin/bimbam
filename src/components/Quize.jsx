@@ -28,25 +28,29 @@ export default function First() {
             <div>
                 <ToastContainer />
             </div>
-            <div className='text-end m-3'>
+            <div className='m-3'>
                 <h1>
                     Questions
                 </h1>
             </div>
-            <div className='container test-center'>
-                <h4 className='text-center'>
-                    Question numero {question.id}
-                </h4>
-                <br />
-                <h2 className='text-center'>
-                    {question.texte}
-                </h2>
-            </div>
+            {question && <>
+                <div className='container test-center'>
+                    <h4 className='text-center'>
+                        Question numero {question.id}
+                    </h4>
+                    <br />
+                    <h2 className='text-center'>
+                        {question.texte}
+                    </h2>
+                </div>
+            </>}
+
             <div>
-                {answer.map((key) => (
-                    <div className='text-center m-auto'>
-                        <p className='text-center'>{key.id}</p>
-                        <p className='text-center'>{key.texte}</p>
+                {answer && answer.map((key, index) => (
+                    <div className='d-flex justify-content-center align-items-baseline m-3' key={index}>
+                        <h5 >{index + 1}</h5>
+                        <h5 className='me-3'>-</h5>
+                        <button className='btn btn-outline-primary'>{key.texte}</button>
                     </div>
                 ))}
             </div>

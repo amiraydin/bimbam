@@ -25,8 +25,8 @@ export default function Login() {
                 i++;
             }
             if (connect === 1) {
-                // addItem('user', user);
-                Navigate("/first");
+                addItem('user', user);
+                Navigate("/home");
             } else {
                 toast('User ou Mot de passe incorrect !');
             }
