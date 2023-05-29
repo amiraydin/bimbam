@@ -22,7 +22,7 @@ export default function Navbar() {
                             {logedin && <a className="nav-link active" aria-current="page" href="/home">Home</a>}
                         </li>
                         <li className="nav-item">
-
+                            <a className="nav-link active" aria-current="page" href="/tondeuse">Tondeuse</a>
                         </li>
                     </ul>
                     <form className="d-flex">
